@@ -52,3 +52,10 @@ crashlytics-build.properties
 *.ttf
 *.woff
 *.woff2
+
+#images
+*.png
+*.svg
+*.jpg
+*.gif
+*.bmp
