@@ -1,0 +1,77 @@
+@charset "UTF-8";
+
+/*     <----- load fonts ----->     */
+@font-face
+{
+    font-family: Titillium Web;
+    src: url(../fonts/Titillium_Web_regular.eot),
+         url(../fonts/Titillium_Web_regular.ttf),
+         url(../fonts/Titillium_Web_regular.woff),
+         url(../fonts/Titillium_Web_regular.woff2);
+}
+@font-face
+{
+    font-family: Titillium Web;
+    src: url(../fonts/Titillium_Web_600.eot),
+         url(../fonts/Titillium_Web_600.ttf),
+         url(../fonts/Titillium_Web_600.woff),
+         url(../fonts/Titillium_Web_600.woff2);
+    font-weight: 600;
+}
+@font-face
+{
+    font-family: Titillium Web;
+    src: url(../fonts/Titillium_Web_700.eot),
+         url(../fonts/Titillium_Web_700.ttf),
+         url(../fonts/Titillium_Web_700.woff),
+         url(../fonts/Titillium_Web_700.woff2);
+    font-weight: 700;
+}
+
+/*     <----- main plugin part ----->     */
+.cc-options, .cc-popup
+{
+    font-family: 'Titillium Web', sans-serif;
+    position: fixed;
+    font-size: 18px;
+}
+.cc-options
+{
+    width: 64px;
+    height: 64px;
+    bottom: 0;
+    right: 0;
+    /*display: none;*/
+    background: url("../img/cookies.png") bottom right no-repeat;
+    background-size: 100%;
+    cursor: pointer;
+}
+.cc-popup
+{
+    width: 250px;
+    padding: 10px;
+    /*height: 75px;*/
+    bottom: 50px;
+    right: 50px;
+    border: 1px solid #222222;
+    border-radius: 6px;
+    background-color: rgba(50, 50, 50, 0.6);
+}
+.cc-popup p
+{
+    margin: 0;
+    color: #ffffff;
+    line-height: 18px;
+}
+.cc-popup a
+{
+    color: #f09700;
+}
+.cc-popup a:hover
+{
+    color: #eeeeee;
+}
+.cc-dismiss
+{
+
+}
