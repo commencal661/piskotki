@@ -29,7 +29,7 @@
 }
 
 /*     <----- main plugin part ----->     */
-.cc-options, .cc-popup
+.cc-options, .cc-popup, .cc-settings
 {
     font-family: 'Titillium Web', sans-serif;
     position: fixed;
@@ -37,41 +37,64 @@
 }
 .cc-options
 {
-    width: 64px;
-    height: 64px;
+    width: 46px;
+    height: 46px;
     bottom: 0;
     right: 0;
     /*display: none;*/
-    background: url("../img/cookies.png") bottom right no-repeat;
+    background: url("../img/cc_wb.png") bottom right no-repeat;
     background-size: 100%;
     cursor: pointer;
 }
-.cc-popup
+.cc-popup, .cc-settings
 {
     width: 250px;
     padding: 10px;
-    /*height: 75px;*/
     bottom: 50px;
     right: 50px;
     border: 1px solid #222222;
     border-radius: 6px;
     background-color: rgba(50, 50, 50, 0.6);
 }
-.cc-popup p
+.cc-settings
+{
+	display: none;
+}
+.cc-popup p, .cc-settings p
 {
     margin: 0;
     color: #ffffff;
     line-height: 18px;
+	text-align: justify;
 }
-.cc-popup a
+.cc-popup a, .cc-settings a
 {
     color: #f09700;
+	transition: all linear .125s;
+	-o-transition: all linear .125s;
+	-moz-transition: all linear .125s;
+	-webkit-transition: all linear .125s;
 }
-.cc-popup a:hover
+.cc-popup a:hover, .cc-settings a:hover
 {
     color: #eeeeee;
 }
-.cc-dismiss
+.cc-dismiss, .cc-dismiss-no
 {
-
+	margin-top: 5px;
+	text-align: center;
+	cursor: pointer;
+	color: #f09700;
+	padding: 2px;
+	background-color: #ffffff;
+	border-radius: 4px;
+	transition: all linear .125s;
+	-o-transition: all linear .125s;
+	-moz-transition: all linear .125s;
+	-webkit-transition: all linear .125s;
+}
+.cc-dismiss:hover, .cc-dismiss-no:hover
+{
+	color: #ffffff;
+	background-color: #f09700;
 }
