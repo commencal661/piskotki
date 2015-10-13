@@ -6,14 +6,12 @@ function CookiesConfNo()
 {
     ClearCookies();
     setCookie('sCookie', 'disabletrack', 186);
-    jQuery("#cookies-confirm").hide();
-    //window.location.reload();
+    jQuery(".cc-popup").hide();
 }
 function CookiesConfYes()
 {
     setCookie('sCookie', 'enabletrack', 186);
-    jQuery("#cookies-confirm").hide();
-    window.location.reload();
+    jQuery(".cc-popup").hide();
 }
 function OpenCookieConfDialog()
 {
@@ -21,13 +19,10 @@ function OpenCookieConfDialog()
     var testcookie = getCookie('sCookie');
     if (!testcookie)
     {
-        //setCookie('sCookie', 'disabletrack', 0);
-        //jQuery("#cookies-confirm").show();
         jQuery('.cc-popup').show();
     }
     else
     {
-        //jQuery("#cookies-confirm").hide();
         jQuery('.cc-popup').hide();
     }
 
@@ -45,12 +40,11 @@ function ClearCookies()
 {
     //clear google cookies
     var cookies = document.cookie.split('; ');
-    //console.log(cookies);
+
     for (var i = 0; i < cookies.length; i++)
     {
         var parts = cookies[i].split('=');
         var name = parts[0];
-        //console.log(name);
 
         Cookies.remove("__utma",
             {
@@ -104,56 +98,55 @@ function ClearCookies()
     }
 }
 
+function OpenCookieOptions()
+{
+	jQuery('.cc-options').click(function()
+	{
+		jQuery('.cc-settings').toggle();
+	});
+}
+
 jQuery(document).ready(function($)
 {
     var popbtnClick = false;
-    $("#cookies-confirm").hide();
+    $(".cc-popup").hide();
 
     // if sCookie does not exist
     OpenCookieConfDialog();
 
-    //-- handling mouse click event with cookie - confirm action
-
-    //-- handle if clicked "Se strinjam"
-    $("#cookies-confirm-yes").click(function()
+	$(".cc-dismiss").click(function()
     {
         CookiesConfYes();
+		window.location.reload(true);
         popbtnClick = true;
     });
-    //-- handle if clicked "Se ne strinjam"
-    $("#cookies-confirm-no").click(function()
+
+    $(".cc-dismiss-no").click(function()
     {
         CookiesConfNo();
         window.location.reload(true);
         popbtnClick = true;
-    });
-
-    //-- on page Piskotki da ne -----------------
-    $("#cookies-confirm-page-yes").click(function()
-    {
-        CookiesConfYes();
-        window.location.reload(true);
-    });
-
-    $("#cookies-confirm-page-no").click(function()
-    {
-        //ClearExistingCookie('aoCookie');
-        //ClearCookies();
-        CookiesConfNo();
-        window.location.reload(true);
     });
 
     $('body').click(function()
     {
         if (!popbtnClick)
         {
-            var testcookie = getCookie('sCookie');
-            if (testcookie == null || testcookie != "disabletrack")
-            {
-                CookiesConfYes();
-            }
+			var testcookie = getCookie('sCookie');
+			if (testcookie === null || testcookie !== "disabletrack")
+			{
+				CookiesConfYes();
+			}
         }
+
+		if ($('.cc-settings').is(':visible')) { $('.cc-settings').toggle();	}
     });
+
+	$('.cc-options').click(function()
+	{
+		OpenCookieOptions();
+		return false;
+	});
 });
 
 function setCookie(name, value, days)
@@ -175,8 +168,8 @@ function getCookie(name)
     for(var i = 0; i < ca.length; i++)
     {
         var c = ca[i];
-        while (c.charAt(0) == ' ') { c = c.substring(1, c.length); }
-        if (c.indexOf(nameEQ) == 0) { return c.substring(nameEQ.length, c.length); }
+        while (c.charAt(0) === ' ') { c = c.substring(1, c.length); }
+        if (c.indexOf(nameEQ) === 0) { return c.substring(nameEQ.length, c.length); }
     }
     return null;
 }
