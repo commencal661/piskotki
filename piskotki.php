@@ -2,12 +2,12 @@
 
 /**
  * @package Piškotki
- * @version 0.3-alpha
+ * @version 1.0-beta
  */
 
 /*
 Plugin Name: Piškotki
-Version: 0.3-alpha
+Version: 1.0-beta
 Author: Aljaž Jelen (Sibit d.o.o.)
 Description: This is a plugin.
 */
@@ -17,22 +17,116 @@ defined('ABSPATH') or die('<h1>One does not simply try to access plugin files di
 define('PISKOTKI_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('PISKOTKI_PLUGIN_DIR', plugin_dir_path(__FILE__ ));
 
+register_activation_hook(__FILE__, 'piskotki_create_page');
+register_deactivation_hook(__FILE__, 'piskotki_remove_page');
+
 function piskotki_add_options_page()
 {
-    add_options_page('PISKOTKI', 'PISKOTKI', 'manage_options', 'piskotki', 'piskotki_settings_page');
+    add_options_page('PIŠKOTKI', 'PIŠKOTKI', 'manage_options', 'piskotki', 'piskotki_settings_page');
 }
 add_action('admin_menu', 'piskotki_add_options_page');
 
+function piskotki_create_page()
+{
+	//TODO: make $_p['post_content'] flexible, so it can be edited through plugin itself.
+	global $wpdb;
+
+	$page_title = 'Piškotki';
+	$page_name = 'piskotki';
+
+	delete_option('piskotki_page_title');
+	add_option('piskotki_page_title', $page_title, '', 'yes');
+
+	delete_option('piskotki_page_name');
+	add_option('piskotki_page_name', $page_name, '', 'yes');
+
+	delete_option('piskotki_page_id');
+	add_option('piskotki_page_id', '0', '', 'yes');
+
+	$page = get_page_by_title($page_title);
+
+	function get_page_content()
+	{
+		//TODO: write a function that will check if content of the page exists, and create it accordingly.
+	}
+
+	if (!$page)
+	{
+		$_p = array();
+		$_p['post_title'] = $page_title;
+		$_p['post_content'] = "This text may be overridden by the plugin. You shouldn't edit it.";
+		$_p['post_status'] = 'publish';
+		$_p['post_type'] = 'page';
+		$_p['comment_status'] = 'closed';
+		$_p['ping_status'] = 'closed';
+
+		$page_id = wp_insert_post($_p);
+	}
+	else
+	{
+		$page_id = $page->ID;
+
+		$page->post_status = 'publish';
+		$page_id = wp_update_post($page);
+
+		delete_option('piskotki_page_id');
+		add_option('piskotki_page_id', $page_id);
+	}
+}
+
+function piskotki_remove_page()
+{
+	global $wpdb;
+
+	$page_title = get_option('piskotki_page_title');
+	$page_name = get_option('piskotki_page_name');
+	$page_id = get_option('piskotki_page_id');
+
+	if ($page_id)
+	{
+		wp_delete_post($page_id);
+	}
+
+	delete_option('piskotki_page_title');
+	delete_option('piskotki_page_name');
+	delete_option('piskotki_page_id');
+}
+
+function piskotki_query_parser($query)
+{
+	$page_name = get_option('piskotki_page_name');
+	$page_id = get_option('piskotki_page_id');
+
+	$query_var = $query->query_vars;
+
+	if (!$query->did_permalink && (isset($query_var['page_id'])) && (intval($query_var['page_id']) == $page_id))
+	{
+		$query->set('piskotki_page_is_called', true);
+		return $query;
+	}
+	elseif (isset($query_var['pagename']) && (($query_var['pagename'] == $page_name) || ($_pos_found = strpos($query_var['pagename'], $page_name.'/') === 0)))
+	{
+		$query->set('piskotki_page_is_called', true);
+		return $query;
+	}
+	else
+	{
+		$query->set('piskotki_page_is_called', false);
+		return $query;
+	}
+}
+add_filter('parse_query', 'piskotki_query_parser');
+
 function register_input_settings()
 {
-    register_setting('piskotki_input', 'message');
-    register_setting('piskotki_input', 'dismiss');
-    register_setting('piskotki_input', 'learnMore');
-    register_setting('piskotki_input', 'link');
-    //register_setting('piskotki_input', 'container');
-    register_setting('piskotki_input', 'theme');
-    //register_setting('piskotki_input', 'expiryDays');
+	register_setting('piskotki_input', 'message');
+	register_setting('piskotki_input', 'dismiss');
+	register_setting('piskotki_input', 'learn_more');
+	register_setting('piskotki_input', 'link');
+	register_setting('piskotki_input', 'theme');
+	register_setting('piskotki_input', 'delete');
 }
+
 if (is_admin())
 {
     add_action('admin_init', 'register_input_settings');
@@ -65,7 +159,7 @@ function piskotki_settings_page()
             </tr>
             <tr valign="top">
                 <th scope="row">Prikaži več</th>
-                <td><input class="regular-text" type="text" name="learnMore" value="<?php echo esc_attr(get_option('learnMore')); ?>" /></td>
+                <td><input class="regular-text" type="text" name="learn_more" value="<?php echo esc_attr(get_option('learn_more')); ?>" /></td>
             </tr>
             <tr valign="top">
                 <th scope="row">Povezava</th>
@@ -76,18 +170,19 @@ function piskotki_settings_page()
                     </p>
                 </td>
             </tr>
-            <!-- <tr valign="top">
-                <th scope="row">Kontejner</th>
-                <td><input type="text" name="container" value="<?php //echo esc_attr(get_option('container')); ?>" /></td>
-            </tr> -->
             <tr valign="top">
                 <th scope="row">Izgled (CSS)</th>
                 <td><input class="regular-text" type="text" name="theme" value="<?php echo esc_attr(get_option('theme')); ?>" /></td>
             </tr>
-            <!-- <tr valign="top">
-                <th scope="row">Veljavnost (v dnevih)</th>
-                <td><input type="text" name="expiryDays" value="<?php //echo esc_attr(get_option('expiryDays')); ?>" /></td>
-            </tr> -->
+            <tr valign="top">
+                <th scope="row">Sporočilo (izbris piškotkov) </th>
+                <td>
+					<input class="regular-text" type="text" name="delete" value="<?php echo esc_attr(get_option('delete')); ?>" />
+					<p class="description">
+						<?php _e('Ta tekst se prikaže, ko se klikne na ikono plugina na spletni strani.'); ?>
+					</p>
+				</td>
+            </tr>
         </table>
         
         <?php submit_button(); ?>
@@ -96,50 +191,42 @@ function piskotki_settings_page()
 
 <?php
 }
-/*
-function echo_settings()
-{
-    $nl = "\n";
 
-    $script = '<script>' . $nl;
-    $script .= '    window.cookieconsent_options = {' . $nl;
-
-    if (get_option('message') != null)    { $script .= "      message: '" . get_option('message') . "'," .       $nl; }
-    if (get_option('dismiss') != null)    { $script .= "      dismiss: '" . get_option('dismiss') . "'," .       $nl; }
-    if (get_option('learnMore') != null)  { $script .= "      learnMore: '" . get_option('learnMore') . "'," .   $nl; }
-    if (get_option('link') != null)       { $script .= "      link: '" . get_option('link') . "'," .             $nl; }
-    if (get_option('container') != null)  { $script .= "      container: '" . get_option('container') . "'," .   $nl; }
-    if (get_option('theme') != null)      { $script .= "      theme: '" . get_option('theme') . "'," .           $nl; }
-    if (get_option('expiryDays') != null) { $script .= "      expiryDays: '" . get_option('expiryDays') . "'," . $nl; }
-
-    $script .= '    };' . $nl;
-    $script .= '</script>';
-
-    echo $script;
-}
-add_action('wp_footer', 'echo_settings');*/
-
+// Frontend stuff
 function echo_popup_box()
 {
     $nl = "\n";
-    $popup  = '<div class="cc-popup">'                                                                     . $nl;
-    $popup .= '    <p>' . get_option('message') . '</p>'                                                   . $nl;
-    $popup .= '    <a href="' . get_option('link') . '">' . get_option('learnMore') . '</a>'               . $nl;
-    $popup .= '    <div class="cc-dismiss">' . get_option('dismiss') . '</div>'                            . $nl;
-    $popup .= '</div>'                                                                                     . $nl;
+    $popup  = '<div class="cc-popup">'                                                        . $nl;
+    $popup .= '    <p>' . get_option('message') . '</p>'                                      . $nl;
+    $popup .= '    <a href="' . get_option('link') . '">' . get_option('learn_more') . '</a>' . $nl;
+    $popup .= '    <div class="cc-dismiss">' . get_option('dismiss') . '</div>'               . $nl;
+    $popup .= '</div>'                                                                        . $nl;
 
     echo $popup;
 }
 add_action('wp_footer', 'echo_popup_box');
 
+function echo_settings_box()
+{
+	$nl = "\n";
+	$popup  = '<div class="cc-settings">'                                                                     . $nl;
+	$popup .= '    <p>' . get_option('delete') . '</p>'                                                       . $nl;
+	$popup .= '    <div class="cc-dismiss-no"><a href="' . get_option('link') . '">' . 'Nastavitve</a></div>' . $nl;
+	$popup .= '</div>'                                                                                        . $nl;
+
+	echo $popup;
+}
+add_action('wp_footer', 'echo_settings_box');
+
 function echo_options()
 {
     $nl = "\n";
-    $options  = '<div class="cc-options" onclick="OpenCookieConfDialog()"></div>' . $nl;
+    $options  = '<div class="cc-options" onclick="OpenCookieOptions()"></div>' . $nl;
 
     echo $options;
 }
 add_action('wp_footer', 'echo_options');
+// End of frontend stuff
 
 function register_scripts_and_styles()
 {
