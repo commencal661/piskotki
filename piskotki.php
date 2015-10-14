@@ -2,12 +2,12 @@
 
 /**
  * @package Piškotki
- * @version 1.0-beta
+ * @version 1.2-beta
  */
 
 /*
 Plugin Name: Piškotki
-Version: 1.0-beta
+Version: 1.1-beta
 Author: Aljaž Jelen (Sibit d.o.o.)
 Description: This is a plugin.
 */
@@ -33,7 +33,6 @@ add_action('admin_menu', 'piskotki_add_options_page');
 
 function piskotki_create_page()
 {
-	//TODO: make $_p['post_content'] flexible, so it can be edited through plugin itself.
 	global $wpdb;
 
 	$page_title = 'Piškotki';
@@ -54,7 +53,7 @@ function piskotki_create_page()
 	{
 		$_p = array();
 		$_p['post_title'] = $page_title;
-		$_p['post_content'] = "This text may be overridden by the plugin. You shouldn't edit it.";
+		$_p['post_content'] = "To besedilo se lahko prepiše preko vtičnika. Ne urejajte ga tukaj!";
 		$_p['post_status'] = 'publish';
 		$_p['post_type'] = 'page';
 		$_p['comment_status'] = 'closed';
@@ -105,7 +104,11 @@ function create_page_content($content)
 	global $post;
 	if ($post->ID == get_id_by_slug('piskotki'))
 	{
-		return get_option('page');
+		$entry = get_option('page');
+		$entry .= '<br><div class="cc-delete">Izbriši piškotke</div>';
+		$entry .= '<div class="cc-create">Ustvari piškotke</div>';
+
+		return $entry;
 	}
 
 	return $content;
@@ -142,7 +145,7 @@ function register_input_settings()
 	register_setting('piskotki_input', 'message');
 	register_setting('piskotki_input', 'dismiss');
 	register_setting('piskotki_input', 'learn_more');
-	register_setting('piskotki_input', 'link');
+	//register_setting('piskotki_input', 'link');
 	register_setting('piskotki_input', 'theme');
 	register_setting('piskotki_input', 'delete');
 	register_setting('piskotki_input', 'page');
@@ -183,15 +186,15 @@ function piskotki_settings_page()
                 <th scope="row">Prikaži več</th>
                 <td><input class="regular-text" type="text" name="learn_more" value="<?php echo esc_attr(get_option('learn_more')); ?>" /></td>
             </tr>
-            <tr valign="top">
+            <!-- <tr valign="top">
                 <th scope="row">Povezava</th>
                 <td>
-                    <input class="regular-text" type="text" name="link" value="<?php echo esc_attr(get_option('link')); ?>" />
+                    <input class="regular-text" type="text" name="link" value="<?php //echo esc_attr(get_option('link')); ?>" />
                     <p class="description">
-                        <?php _e('Povezava naj vodi do WordPress strani, ki vsebuje pogoje uporabe tega spletnega mesta.'); ?>
+                        <?php //_e('Povezava naj vodi do WordPress strani, ki vsebuje pogoje uporabe tega spletnega mesta.'); ?>
                     </p>
                 </td>
-            </tr>
+            </tr> -->
 			<?php if ($debug == true): ?>
             <tr valign="top">
                 <th scope="row">Izgled (CSS)</th>
@@ -230,12 +233,15 @@ function piskotki_settings_page()
 // Frontend stuff
 function echo_popup_box()
 {
+	$id = get_id_by_slug('piskotki');
+	$link = get_page_link($id);
+
     $nl = "\n";
-    $popup  = '<div class="cc-popup">'                                                        . $nl;
-    $popup .= '    <p>' . get_option('message') . '</p>'                                      . $nl;
-    $popup .= '    <a href="' . get_option('link') . '">' . get_option('learn_more') . '</a>' . $nl;
-    $popup .= '    <div class="cc-dismiss">' . get_option('dismiss') . '</div>'               . $nl;
-    $popup .= '</div>'                                                                        . $nl;
+    $popup  = '<div class="cc-popup">'                                           . $nl;
+    $popup .= '    <p>' . get_option('message') . '</p>'                         . $nl;
+    $popup .= '    <a href="' . $link . '">' . get_option('learn_more') . '</a>' . $nl;
+    $popup .= '    <div class="cc-dismiss">' . get_option('dismiss') . '</div>'  . $nl;
+    $popup .= '</div>'                                                           . $nl;
 
     echo $popup;
 }
@@ -243,11 +249,14 @@ add_action('wp_footer', 'echo_popup_box');
 
 function echo_settings_box()
 {
+	$id = get_id_by_slug('piskotki');
+	$link = get_page_link($id);
+
 	$nl = "\n";
-	$popup  = '<div class="cc-settings">'                                                                     . $nl;
-	$popup .= '    <p>' . get_option('delete') . '</p>'                                                       . $nl;
-	$popup .= '    <div class="cc-dismiss-no"><a href="' . get_option('link') . '">' . 'Nastavitve</a></div>' . $nl;
-	$popup .= '</div>'                                                                                        . $nl;
+	$popup  = '<div class="cc-settings">'                                                        . $nl;
+	$popup .= '    <p>' . get_option('delete') . '</p>'                                          . $nl;
+	$popup .= '    <div class="cc-dismiss-no"><a href="' . $link . '">' . 'Nastavitve</a></div>' . $nl;
+	$popup .= '</div>'                                                                           . $nl;
 
 	echo $popup;
 }
@@ -261,6 +270,7 @@ function echo_options()
     echo $options;
 }
 add_action('wp_footer', 'echo_options');
+
 // End of frontend stuff
 
 function register_scripts_and_styles()

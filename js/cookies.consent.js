@@ -106,6 +106,19 @@ function OpenCookieOptions()
 	});
 }
 
+jQuery(function($)
+{
+	var popbtnClick = false;
+	$(".cc-popup").hide();
+
+	$(".cc-dismiss").click(function()
+	{
+		CookiesConfYes();
+		window.location.reload(true);
+		popbtnClick = true;
+	});
+});
+
 jQuery(document).ready(function($)
 {
     var popbtnClick = false;
@@ -113,15 +126,22 @@ jQuery(document).ready(function($)
 
     // if sCookie does not exist
     OpenCookieConfDialog();
-
+	/*
 	$(".cc-dismiss").click(function()
     {
         CookiesConfYes();
 		window.location.reload(true);
         popbtnClick = true;
     });
+	*/
+	$(".cc-create").click(function()
+	{
+		CookiesConfYes();
+		window.location.reload(true);
+		popbtnClick = true;
+	});
 
-    $(".cc-dismiss-no").click(function()
+    $(".cc-delete").click(function()
     {
         CookiesConfNo();
         window.location.reload(true);
@@ -147,6 +167,26 @@ jQuery(document).ready(function($)
 		OpenCookieOptions();
 		return false;
 	});
+
+	var test_cookie = getCookie('sCookie');
+	if (test_cookie === "enabletrack")
+	{
+		$('.cc-create').off();
+		$('.cc-create').css({
+			'background-color': '#eeeeee',
+			'color': '#666666',
+			'cursor': 'default'
+		});
+	}
+	else if (test_cookie === "disabletrack")
+	{
+		$('.cc-delete').off();
+		$('.cc-delete').css({
+			'background-color': '#eeeeee',
+			'color': '#666666',
+			'cursor': 'default'
+		});
+	}
 });
 
 function setCookie(name, value, days)

@@ -79,7 +79,8 @@
 {
     color: #eeeeee;
 }
-.cc-dismiss, .cc-dismiss-no
+.cc-dismiss, .cc-dismiss-no,
+.cc-delete, .cc-create
 {
 	margin-top: 5px;
 	text-align: center;
@@ -93,8 +94,15 @@
 	-moz-transition: all linear .125s;
 	-webkit-transition: all linear .125s;
 }
-.cc-dismiss:hover, .cc-dismiss-no:hover
+.cc-dismiss:hover, .cc-dismiss-no:hover,
+.cc-delete:hover, .cc-create:hover
 {
 	color: #ffffff;
 	background-color: #f09700;
+}
+.cc-delete, .cc-create
+{
+	width: 150px;
+	border: 1px solid #eeeeee;
+	font-family: 'Titillium Web', sans-serif;
 }
