@@ -7,9 +7,9 @@
 
 /*
 Plugin Name: Piškotki
-Version: 1.1-beta
+Version: 1.2-beta
 Author: Aljaž Jelen (Sibit d.o.o.)
-Description: This is a plugin.
+Description: This is a custom cookie consent plugin for WordPress. Slovenian only.
 */
 
 // This is used to easily turn on and off all "experimental" features.
