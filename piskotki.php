@@ -12,6 +12,11 @@ Author: Aljaž Jelen (Sibit d.o.o.)
 Description: This is a plugin.
 */
 
+// This is used to easily turn on and off all "experimental" features.
+global $debug;
+$debug = false;
+//$debug = true;
+
 defined('ABSPATH') or die('<h1>One does not simply try to access plugin files directly.</h1>');
 
 define('PISKOTKI_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -44,11 +49,6 @@ function piskotki_create_page()
 	add_option('piskotki_page_id', '0', '', 'yes');
 
 	$page = get_page_by_title($page_title);
-
-	function get_page_content()
-	{
-		//TODO: write a function that will check if content of the page exists, and create it accordingly.
-	}
 
 	if (!$page)
 	{
@@ -92,6 +92,26 @@ function piskotki_remove_page()
 	delete_option('piskotki_page_id');
 }
 
+function get_id_by_slug($slug)
+{
+	$page = get_page_by_path($slug);
+	if ($page) { return $page->ID; }
+	else { return NULL; }
+}
+
+// This function overrides the content of the generated page.
+function create_page_content($content)
+{
+	global $post;
+	if ($post->ID == get_id_by_slug('piskotki'))
+	{
+		return get_option('page');
+	}
+
+	return $content;
+}
+add_filter('the_content', 'create_page_content');
+
 function piskotki_query_parser($query)
 {
 	$page_name = get_option('piskotki_page_name');
@@ -125,6 +145,7 @@ function register_input_settings()
 	register_setting('piskotki_input', 'link');
 	register_setting('piskotki_input', 'theme');
 	register_setting('piskotki_input', 'delete');
+	register_setting('piskotki_input', 'page');
 }
 
 if (is_admin())
@@ -134,6 +155,7 @@ if (is_admin())
 
 function piskotki_settings_page()
 {
+	global $debug;
 ?>
 
 <div class="wrap">
@@ -170,10 +192,12 @@ function piskotki_settings_page()
                     </p>
                 </td>
             </tr>
+			<?php if ($debug == true): ?>
             <tr valign="top">
                 <th scope="row">Izgled (CSS)</th>
                 <td><input class="regular-text" type="text" name="theme" value="<?php echo esc_attr(get_option('theme')); ?>" /></td>
             </tr>
+			<?php endif; ?>
             <tr valign="top">
                 <th scope="row">Sporočilo (izbris piškotkov) </th>
                 <td>
@@ -183,6 +207,17 @@ function piskotki_settings_page()
 					</p>
 				</td>
             </tr>
+			<tr valign="top">
+				<th scope="row">Vsebina strani</th>
+				<td>
+                    <textarea class="regular-text" name="page" rows="12" cols="60"><?php
+						echo esc_textarea(get_option('page'));
+					?></textarea>
+					<p class="description">
+						<?php _e('Ta tekst se prikaže na strani z informacijami o piškotkih.'); ?>
+					</p>
+				</td>
+			</tr>
         </table>
         
         <?php submit_button(); ?>
