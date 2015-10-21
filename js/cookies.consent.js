@@ -108,32 +108,19 @@ function OpenCookieOptions()
 
 jQuery(function($)
 {
-	var popbtnClick = false;
-	$(".cc-popup").hide();
-
-	$(".cc-dismiss").click(function()
-	{
-		CookiesConfYes();
-		window.location.reload(true);
-		popbtnClick = true;
-	});
-});
-
-jQuery(document).ready(function($)
-{
     var popbtnClick = false;
     $(".cc-popup").hide();
 
     // if sCookie does not exist
     OpenCookieConfDialog();
-	/*
+
 	$(".cc-dismiss").click(function()
     {
         CookiesConfYes();
 		window.location.reload(true);
         popbtnClick = true;
     });
-	*/
+
 	$(".cc-create").click(function()
 	{
 		CookiesConfYes();

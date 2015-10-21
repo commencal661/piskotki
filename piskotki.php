@@ -91,7 +91,7 @@ function piskotki_remove_page()
 	delete_option('piskotki_page_id');
 }
 
-function get_id_by_slug($slug)
+function piskotki_get_id_by_slug($slug)
 {
 	$page = get_page_by_path($slug);
 	if ($page) { return $page->ID; }
@@ -102,7 +102,7 @@ function get_id_by_slug($slug)
 function create_page_content($content)
 {
 	global $post;
-	if ($post->ID == get_id_by_slug('piskotki'))
+	if ($post->ID == piskotki_get_id_by_slug('piskotki'))
 	{
 		$entry = get_option('page');
 		$entry .= '<br><div class="cc-delete">Izbriši piškotke</div>';
@@ -233,7 +233,7 @@ function piskotki_settings_page()
 // Frontend stuff
 function echo_popup_box()
 {
-	$id = get_id_by_slug('piskotki');
+	$id = piskotki_get_id_by_slug('piskotki');
 	$link = get_page_link($id);
 
     $nl = "\n";
@@ -249,7 +249,7 @@ add_action('wp_footer', 'echo_popup_box');
 
 function echo_settings_box()
 {
-	$id = get_id_by_slug('piskotki');
+	$id = piskotki_get_id_by_slug('piskotki');
 	$link = get_page_link($id);
 
 	$nl = "\n";
@@ -280,14 +280,14 @@ function register_scripts_and_styles()
         plugins_url('js/js.cookie.js', __FILE__),
         array('jquery'),
         '2.0.3',
-        true
+        false
     );
     wp_register_script(
         'conf',
         plugins_url('js/cookies.consent.js', __FILE__),
         array('jquery'),
         '1.0',
-        true
+        false
     );
     wp_register_style(
         'cookies',
